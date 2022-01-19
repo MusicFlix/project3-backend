@@ -2,7 +2,7 @@ const express = require('express')
 const passport = require('passport')
 
 // pull in Mongoose model for examples
-const Movie = require('../models/movie')
+const Message = require('../models/message')
 
 // this is a collection of methods that help us detect situations when we need
 // to throw a custom error
@@ -27,43 +27,43 @@ const router = express.Router()
 
 // INDEX
 // GET /movies
-router.get('/movies', (req, res, next) => {
+router.get('/messages', (req, res, next) => {
   // queries to get a genre
-  Movie.find()
-    .then(movies => {
+  Message.find()
+    .then(messages => {
       // `examples` will be an array of Mongoose documents
       // we want to convert each one to a POJO, so we use `.map` to
       // apply `.toObject` to each one
-      return movies.map(movie => movie.toObject())
+      return messages.map(message => message.toObject())
     })
     // respond with status 200 and JSON of the examples
-    .then(movies => res.status(200).json({ movies: movies }))
+    .then(messages => res.status(200).json({ messages: messages }))
     // if an error occurs, pass it to the handler
     .catch(next)
 })
 
 // SHOW
-// GET /movies/5a7db6c74d55bc51bdf39793
-router.get('/movies/:id', (req, res, next) => {
+// GET /messages/5a7db6c74d55bc51bdf39793
+router.get('/messages/:id', (req, res, next) => {
   // req.params.id will be set based on the `:id` in the route
-  Movie.findById(req.params.id)
+  Message.findById(req.params.id)
     .then(handle404)
     // if `findById` is succesful, respond with 200 and "example" JSON
-    .then(movie => res.status(200).json({ movie: movie.toObject() }))
+    .then(message => res.status(200).json({ message: message.toObject() }))
     // if an error occurs, pass it to the handler
     .catch(next)
 })
 
 // CREATE
-// POST /movies
-router.post('/movies', (req, res, next) => {
+// POST /messages
+router.post('/messages', (req, res, next) => {
   // set owner of new example to be current user
-  // req.body.movie.owner = req.user.id
+  // req.body.message.owner = req.user.id
 
-  Movie.create(req.body.movie)
+  Message.create(req.body.message)
     // respond to succesful `create` with status 201 and JSON of new "example"
-    .then(movie => {
-      res.status(201).json({ movie: movie.toObject() })
+    .then(message => {
+      res.status(201).json({ message: message.toObject() })
     })
     // if an error occurs, pass it off to our error handler
     // the error handler needs the error message and the `res` object so that it
@@ -72,25 +72,25 @@ router.post('/movies', (req, res, next) => {
 })
 
 // UPDATE
-// PATCH /movies/5a7db6c74d55bc51bdf39793
-router.patch('/movies/:id', removeBlanks, (req, res, next) => {
+// PATCH /messages/5a7db6c74d55bc51bdf39793
+router.patch('/messages/:id', removeBlanks, (req, res, next) => {
   // if the client attempts to change the `owner` property by including a new
   // owner, prevent that by deleting that key/value pair
-  delete req.body.movie.owner
+  delete req.body.message.owner
 
-  Movie.findById(req.params.id)
+  Message.findById(req.params.id)
     .then(handle404)
-    .then(movie => {
+    .then(message => {
       // pass the `req` object and the Mongoose record to `requireOwnership`
       // it will throw an error if the current user isn't the owner
 
       /****************
        * comment back in
        */
-      // requireOwnership(req, movie)
+      // requireOwnership(req, message)
 
       // pass the result of Mongoose's `.update` to the next `.then`
-      return movie.updateOne(req.body.movie)
+      return message.updateOne(req.body.message)
     })
     // if that succeeded, return 204 and no JSON
     .then(() => res.sendStatus(204))
@@ -99,15 +99,15 @@ router.patch('/movies/:id', removeBlanks, (req, res, next) => {
 })
 
 // DESTROY
-// DELETE /movies/5a7db6c74d55bc51bdf39793
-router.delete('/movies/:id', requireToken, (req, res, next) => {
-  Movie.findById(req.params.id)
+// DELETE /messages/5a7db6c74d55bc51bdf39793
+router.delete('/messages/:id', requireToken, (req, res, next) => {
+  Message.findById(req.params.id)
     .then(handle404)
-    .then(movie => {
+    .then(message => {
       // throw an error if current user doesn't own `example`
-      requireOwnership(req, movie)
+      requireOwnership(req, message)
       // delete the example ONLY IF the above didn't throw
-      movie.deleteOne()
+      message.deleteOne()
     })
     // send back 204 and no content if the deletion succeeded
     .then(() => res.sendStatus(204))
