@@ -29,6 +29,9 @@ const router = express.Router()
 // GET /movies
 router.get('/messages', (req, res, next) => {
   // queries to get a genre
+
+  // console.log(req.body.movieId)
+
   Message.find()
     .then(messages => {
       // `examples` will be an array of Mongoose documents
@@ -45,25 +48,40 @@ router.get('/messages', (req, res, next) => {
 // SHOW
 // GET /messages/5a7db6c74d55bc51bdf39793
 router.get('/messages/:id', (req, res, next) => {
-  // req.params.id will be set based on the `:id` in the route
-  Message.findById(req.params.id)
-    .then(handle404)
-    // if `findById` is succesful, respond with 200 and "example" JSON
-    .then(message => res.status(200).json({ message: message.toObject() }))
+  Message.find({ 'board': req.params.id })
+    .then(messages => {
+      // `examples` will be an array of Mongoose documents
+      // we want to convert each one to a POJO, so we use `.map` to
+      // apply `.toObject` to each one
+      return messages.map(message => message.toObject())
+    })
+    // respond with status 200 and JSON of the examples
+    .then(messages => res.status(200).json({ messages: messages }))
     // if an error occurs, pass it to the handler
     .catch(next)
+
+  // // req.params.id will be set based on the `:id` in the route
+  // Message.find({ 'board': req.params.id })
+  //   .then(handle404)
+  //   // if `findById` is succesful, respond with 200 and "example" JSON
+  //   .then(message => res.status(200).json({ message: message.toObject() }))
+  //   // if an error occurs, pass it to the handler
+  //   .catch(next)
 })
 
 // CREATE
 // POST /messages
-router.post('/messages', (req, res, next) => {
+router.post('/messages/', (req, res, next) => {
   // set owner of new example to be current user
   // req.body.message.owner = req.user.id
+
+  console.log(req.body.message.text)
 
   Message.create(req.body.message)
     // respond to succesful `create` with status 201 and JSON of new "example"
     .then(message => {
-      res.status(201).json({ message: message.toObject() })
+      // res.status(201).json({ message: message.toObject() })
+      res.sendStatus(201)
     })
     // if an error occurs, pass it off to our error handler
     // the error handler needs the error message and the `res` object so that it
