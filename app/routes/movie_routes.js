@@ -29,7 +29,9 @@ const router = express.Router()
 // GET /movies
 router.get('/movies', (req, res, next) => {
   // queries to get a genre
-  Movie.find()
+
+  console.log(req.query.genre)
+  Movie.find({ 'genre': req.query.genre })
     .then(movies => {
       // `examples` will be an array of Mongoose documents
       // we want to convert each one to a POJO, so we use `.map` to
@@ -100,12 +102,12 @@ router.patch('/movies/:id', removeBlanks, (req, res, next) => {
 
 // DESTROY
 // DELETE /movies/5a7db6c74d55bc51bdf39793
-router.delete('/movies/:id', requireToken, (req, res, next) => {
+router.delete('/movies/:id', (req, res, next) => {
   Movie.findById(req.params.id)
     .then(handle404)
     .then(movie => {
       // throw an error if current user doesn't own `example`
-      requireOwnership(req, movie)
+      // requireOwnership(req, movie)
       // delete the example ONLY IF the above didn't throw
       movie.deleteOne()
     })
