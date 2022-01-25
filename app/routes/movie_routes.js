@@ -30,8 +30,9 @@ const router = express.Router()
 router.get('/movies', (req, res, next) => {
   // queries to get a genre
 
-  console.log(req.query.genre)
-  Movie.find({ 'genre': req.query.genre })
+  // console.log(req.query.genre)
+  // Movie.find({ 'genre': req.query.genre })
+  Movie.find()
     .then(movies => {
       // `examples` will be an array of Mongoose documents
       // we want to convert each one to a POJO, so we use `.map` to
