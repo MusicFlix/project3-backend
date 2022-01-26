@@ -33,14 +33,18 @@ router.get('/messages', (req, res, next) => {
   // console.log(req.body.movieId)
 
   Message.find()
+    .populate('owner')
     .then(messages => {
       // `examples` will be an array of Mongoose documents
       // we want to convert each one to a POJO, so we use `.map` to
       // apply `.toObject` to each one
+      console.log(messages)
       return messages.map(message => message.toObject())
     })
     // respond with status 200 and JSON of the examples
-    .then(messages => res.status(200).json({ messages: messages }))
+    .then(messages => {
+      return res.status(200).json({ messages: messages })
+    })
     // if an error occurs, pass it to the handler
     .catch(next)
 })
@@ -49,6 +53,7 @@ router.get('/messages', (req, res, next) => {
 // GET /messages/5a7db6c74d55bc51bdf39793
 router.get('/messages/:id', (req, res, next) => {
   Message.find({ 'board': req.params.id })
+    .populate('owner')
     .then(messages => {
       // `examples` will be an array of Mongoose documents
       // we want to convert each one to a POJO, so we use `.map` to
@@ -118,12 +123,12 @@ router.patch('/messages/:id', removeBlanks, (req, res, next) => {
 
 // DESTROY
 // DELETE /messages/5a7db6c74d55bc51bdf39793
-router.delete('/messages/:id', requireToken, (req, res, next) => {
+router.delete('/messages/:id', (req, res, next) => {
   Message.findById(req.params.id)
     .then(handle404)
     .then(message => {
       // throw an error if current user doesn't own `example`
-      requireOwnership(req, message)
+      // requireOwnership(req, message)
       // delete the example ONLY IF the above didn't throw
       message.deleteOne()
     })
