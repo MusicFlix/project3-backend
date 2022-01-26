@@ -33,7 +33,6 @@ router.get('/messages', (req, res, next) => {
   // console.log(req.body.movieId)
 
   Message.find()
-    .populate('owner')
     .then(messages => {
       // `examples` will be an array of Mongoose documents
       // we want to convert each one to a POJO, so we use `.map` to
@@ -76,7 +75,7 @@ router.get('/messages/:id', (req, res, next) => {
 
 // CREATE
 // POST /messages
-router.post('/messages/', (req, res, next) => {
+router.post('/messages/', requireToken, (req, res, next) => {
   // set owner of new example to be current user
   // req.body.message.owner = req.user.id
 
@@ -96,7 +95,7 @@ router.post('/messages/', (req, res, next) => {
 
 // UPDATE
 // PATCH /messages/5a7db6c74d55bc51bdf39793
-router.patch('/messages/:id', removeBlanks, (req, res, next) => {
+router.patch('/messages/:id', requireToken, removeBlanks, (req, res, next) => {
   // if the client attempts to change the `owner` property by including a new
   // owner, prevent that by deleting that key/value pair
   delete req.body.message.owner
@@ -110,7 +109,7 @@ router.patch('/messages/:id', removeBlanks, (req, res, next) => {
       /****************
        * comment back in
        */
-      // requireOwnership(req, message)
+      requireOwnership(req, message)
 
       // pass the result of Mongoose's `.update` to the next `.then`
       return message.updateOne(req.body.message)
@@ -123,12 +122,12 @@ router.patch('/messages/:id', removeBlanks, (req, res, next) => {
 
 // DESTROY
 // DELETE /messages/5a7db6c74d55bc51bdf39793
-router.delete('/messages/:id', (req, res, next) => {
+router.delete('/messages/:id', requireToken, (req, res, next) => {
   Message.findById(req.params.id)
     .then(handle404)
     .then(message => {
       // throw an error if current user doesn't own `example`
-      // requireOwnership(req, message)
+      requireOwnership(req, message)
       // delete the example ONLY IF the above didn't throw
       message.deleteOne()
     })
