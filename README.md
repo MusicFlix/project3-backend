@@ -15,6 +15,7 @@ users logged in.
 
 ### ERD
 ![img](https://imgur.com/YXJgGmv)
+(https://imgur.com/YXJgGmv)
 
 ### User Stories
 1. As an unregistered user, I would like to sign up with email and password.<br>
