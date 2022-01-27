@@ -11,7 +11,7 @@ Click on the desired music video, press play, and take a chill pill. If desired 
 users logged in.
 
 ### ERD
-![img](https://imgur.com/a/pSgEDOf)
+![img](https://imgur.com/YXJgGmv)
 
 ### User Stories
 1. As an unregistered user, I would like to sign up with email and password.<br>
